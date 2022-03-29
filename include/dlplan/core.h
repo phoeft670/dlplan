@@ -22,6 +22,7 @@ class VocabularyInfoImpl;
 class SyntacticElementFactory;
 class InstanceInfo;
 class VocabularyInfo;
+struct EvaluationContext;
 namespace element {
     template<typename T>
     class Element;
@@ -495,6 +496,43 @@ public:
     const ConceptDenotation& get_top_concept() const;
     const RoleDenotation& get_top_role() const;
     std::shared_ptr<const InstanceInfoRoot> get_instance_info_root() const;
+};
+
+/*
+  Not thread safe.
+  Do we want to make this thread safe, or use one cache for each thread?
+
+  We omit templatization because there are currently just two Denotations.
+*/
+class PerElementEvaluationCache {
+private:
+    phmap::flat_hash_map<int, ConceptDenotation> m_concept_idx_to_denotation;
+    phmap::flat_hash_map<int, RoleDenotation> m_role_idx_to_denotation;
+
+    std::shared_ptr<const State> m_cached_state;
+
+private:
+    void clear_cache();
+
+public:
+    PerElementEvaluationCache();
+    PerElementEvaluationCache(const PerElementEvaluationCache& other);
+    PerElementEvaluationCache& operator=(const PerElementEvaluationCache& other);
+    PerElementEvaluationCache(PerElementEvaluationCache&& other);
+    PerElementEvaluationCache& operator=(PerElementEvaluationCache&& other);
+    ~PerElementEvaluationCache();
+
+    /**
+     * Retrieve denotation.
+     * Just locking mutex is insufficient because we return a reference.
+     */
+    const ConceptDenotation& retrieve_or_evaluate(const element::Concept& concept, EvaluationContext& evaluation_context);
+    const RoleDenotation& retrieve_or_evaluate(const element::Role& role, EvaluationContext& evaluation_context);
+};
+
+struct EvaluationContext {
+    std::shared_ptr<const State> state;
+    PerElementEvaluationCache& cache;
 };
 
 
