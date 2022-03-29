@@ -33,6 +33,27 @@ public:
         return result;
     }
 
+    ConceptDenotation evaluate(EvaluationContext& context) const override {
+        // check cache
+        auto find = context.concept_cache.find(get_index(), context.state);
+        if (find != context.concept_cache.end()) {
+            return find->second;
+        }
+        // Create new cache entry and compute the result inplace.
+        auto result = context.concept_cache.insert(std::make_pair(get_index(), context.state->get_instance_info()->get_top_concept()));
+        auto& result_denotation = result.first->second;
+        // Actual computation: find counterexamples b : exists b . (a,b) in R and b notin C
+        const auto role_denot = m_role->evaluate(context);
+        const auto concept_denot = m_concept->evaluate(context);
+        for (const auto& pair : role_denot) {
+            if (!concept_denot.contains(pair.second)) {
+                result_denotation.erase(pair.first);
+            }
+        }
+        // return result stored in cache;
+        return result.first->second;
+    }
+
     int compute_complexity() const override {
         return m_role->compute_complexity() + m_concept->compute_complexity() + 1;
     }

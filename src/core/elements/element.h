@@ -31,6 +31,9 @@ public:
 
     virtual T evaluate(const State& state) const = 0;
 
+    /**
+     * Evaluate using a cache.
+     */
     virtual T evaluate(EvaluationContext& context) const = 0;
 
     virtual int compute_complexity() const = 0;

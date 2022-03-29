@@ -501,38 +501,41 @@ public:
 /*
   Not thread safe.
   Do we want to make this thread safe, or use one cache for each thread?
-
-  We omit templatization because there are currently just two Denotations.
+  Dominik: If every thread works on 1 state and N features then no evaluation
+           can be shared across different threads => one cache per thread.
 */
+template<typename Element, typename Denotation>
 class PerElementEvaluationCache {
 private:
-    phmap::flat_hash_map<int, ConceptDenotation> m_concept_idx_to_denotation;
-    phmap::flat_hash_map<int, RoleDenotation> m_role_idx_to_denotation;
+    // Alternative that is easier to copy but has an additional indirection: phmap::flat_hash_map<int, Denotation*>
+    phmap::flat_hash_map<int, Denotation> m_element_idx_to_denotation;
 
     std::shared_ptr<const State> m_cached_state;
 
-private:
-    void clear_cache();
-
 public:
     PerElementEvaluationCache();
-    PerElementEvaluationCache(const PerElementEvaluationCache& other);
-    PerElementEvaluationCache& operator=(const PerElementEvaluationCache& other);
-    PerElementEvaluationCache(PerElementEvaluationCache&& other);
-    PerElementEvaluationCache& operator=(PerElementEvaluationCache&& other);
+    PerElementEvaluationCache(const PerElementEvaluationCache<Element, Denotation>& other);
+    PerElementEvaluationCache& operator=(const PerElementEvaluationCache<Element, Denotation>& other);
+    PerElementEvaluationCache(PerElementEvaluationCache<Element, Denotation>&& other);
+    PerElementEvaluationCache& operator=(PerElementEvaluationCache<Element, Denotation>&& other);
     ~PerElementEvaluationCache();
 
     /**
-     * Retrieve denotation.
-     * Just locking mutex is insufficient because we return a reference.
+     * Methods to check/get existing entries.
      */
-    const ConceptDenotation& retrieve_or_evaluate(const element::Concept& concept, EvaluationContext& evaluation_context);
-    const RoleDenotation& retrieve_or_evaluate(const element::Role& role, EvaluationContext& evaluation_context);
+    typename phmap::flat_hash_map<int, Denotation>::const_iterator find(int index, std::shared_ptr<const State> state) const;
+    typename phmap::flat_hash_map<int, Denotation>::const_iterator end() const;
+
+    /**
+     * Method to insert an entry.
+     */
+    std::pair<typename phmap::flat_hash_map<int, Denotation>::iterator, bool> insert(std::pair<int, Denotation>&& val);
 };
 
 struct EvaluationContext {
     std::shared_ptr<const State> state;
-    PerElementEvaluationCache& cache;
+    PerElementEvaluationCache<element::Concept, ConceptDenotation>& concept_cache;
+    PerElementEvaluationCache<element::Role, RoleDenotation>& role_cache;
 };
 
 

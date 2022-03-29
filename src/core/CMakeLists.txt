@@ -8,7 +8,6 @@ target_sources(dlplancore
         element_factory.cpp
         instance_info.cpp
         vocabulary_info.cpp
-        per_element_evaluation_cache.cpp
         predicate.cpp
         object.cpp
         parser/parser.cpp
