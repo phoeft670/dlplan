@@ -504,8 +504,8 @@ public:
   Dominik: If every thread works on 1 state and N features then no evaluation
            can be shared across different threads => one cache per thread.
 */
-template<typename Element, typename Denotation>
-class PerElementEvaluationCache {
+template<typename Denotation>
+class PerElementDenotationCache {
 private:
     // Alternative that is easier to copy but has an additional indirection: phmap::flat_hash_map<int, Denotation*>
     phmap::flat_hash_map<int, Denotation> m_element_idx_to_denotation;
@@ -513,12 +513,12 @@ private:
     std::shared_ptr<const State> m_cached_state;
 
 public:
-    PerElementEvaluationCache();
-    PerElementEvaluationCache(const PerElementEvaluationCache<Element, Denotation>& other);
-    PerElementEvaluationCache& operator=(const PerElementEvaluationCache<Element, Denotation>& other);
-    PerElementEvaluationCache(PerElementEvaluationCache<Element, Denotation>&& other);
-    PerElementEvaluationCache& operator=(PerElementEvaluationCache<Element, Denotation>&& other);
-    ~PerElementEvaluationCache();
+    PerElementDenotationCache();
+    PerElementDenotationCache(const PerElementDenotationCache<Element, Denotation>& other);
+    PerElementDenotationCache& operator=(const PerElementDenotationCache<Element, Denotation>& other);
+    PerElementDenotationCache(PerElementDenotationCache<Element, Denotation>&& other);
+    PerElementDenotationCache& operator=(PerElementDenotationCache<Element, Denotation>&& other);
+    ~PerElementDenotationCache();
 
     /**
      * Methods to check/get existing entries.
@@ -534,8 +534,8 @@ public:
 
 struct EvaluationContext {
     std::shared_ptr<const State> state;
-    PerElementEvaluationCache<element::Concept, ConceptDenotation>& concept_cache;
-    PerElementEvaluationCache<element::Role, RoleDenotation>& role_cache;
+    PerElementDenotationCache<ConceptDenotation>& concept_cache;
+    PerElementDenotationCache<RoleDenotation>& role_cache;
 };
 
 

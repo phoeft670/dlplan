@@ -23,6 +23,8 @@ protected:
 
     static std::function<ConceptTaskResult(const States&, const core::Concept&)> m_task;
 
+    static std::function<std::vector<core::ConceptDenotation>(const core::State&, const std::vector<core::Concept>&, const core::PerElementDenotationCache<core::ConceptDenotation>&)> m_task_2;
+
 protected:
     void parse_results_of_tasks_impl(int iteration, GeneratorData& data) override;
 

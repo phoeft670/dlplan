@@ -11,6 +11,19 @@ std::function<ConceptTaskResult(const States&, const core::Concept&)> Concept::m
         compute_hash(evaluate_concept(element, states)));
 };
 
+// We pass the cache as const reference because we only read from it.
+// This allo
+std::function<std::vector<core::ConceptDenotation>(const core::State&, const std::vector<core::Concept>&, const core::PerElementDenotationCache<core::ConceptDenotation>&)> Concept::m_task_2 =
+[](const core::State& state, const std::vector<core::Concept>& concepts, const core::PerElementDenotationCache<core::ConceptDenotation>& cache) {
+    std::vector<core::ConceptDenotation> result;
+    result.reserve(concepts.size());
+    for (const auto& concept : concepts) {
+        result.push_back(concept.evaluate(state));
+    }
+    return result;
+};
+
+
 void Concept::parse_results_of_tasks_impl(int iteration, GeneratorData& data) {
     /* Wait for the result and add it. */
     while (!m_tasks.empty()) {
