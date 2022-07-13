@@ -12,11 +12,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O3 -DDEBUG")
 
 # Set a default build type if none was specified
 set(default_build_type "Debug")
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to '${default_build_type}', as none was specified.")
-    set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
-        STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting build type to '${default_build_type}', as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+    STRING "Choose the type of build." FORCE)
 endif()
+
+find_package(Protobuf REQUIRED)
 
 include_directories(include/)
 
@@ -24,7 +27,7 @@ add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(experiments)
 
-enable_testing()  # This needs to be here before calling add_subdirectory
+enable_testing() # This needs to be here before calling add_subdirectory
 add_subdirectory(tests)
 
 if(DLPLAN_PYTHON)
