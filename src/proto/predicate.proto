@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Predicate {
+  enum Status {
+    PREDICATE_FLUID = 0;
+    PREDICATE_CONSTANT = 1;
+  }
+
+  string name = 1;
+  int32 arity = 2;
+  Status status = 3;
+  string domain = 4;
+}
+

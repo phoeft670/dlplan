@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message Atom {
+    enum Status {
+        fluid = 0;
+        static = 1;
+    }
+
+    string predicte = 1;
+    int32 arity = 2;
+    repeated string names = 3;
+    Status status = 4;
+    string domain = 5;
+    string problem = 6;
+}
